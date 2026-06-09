@@ -1,0 +1,57 @@
+name: Issue Triage with Claude
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  triage:
+    # No interferir con el workflow claude.yml que maneja menciones @claude
+    if: |
+      !contains(github.event.issue.body, '@claude') &&
+      !contains(github.event.issue.title, '@claude')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Triage issue with Claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          claude_args: '--allowedTools "Bash(gh issue *),Bash(gh label list)"'
+          prompt: |
+            Eres un agente de triage para el repositorio de un juego de Tetris en JavaScript vanilla.
+            El repositorio tiene tres archivos principales: game.js (lógica ~300 líneas), index.html (DOM y canvas) y style.css (estilos retro).
+
+            Se ha creado o editado el issue #${{ github.event.issue.number }}.
+
+            Sigue estos pasos:
+
+            1. Lee el issue completo con: gh issue view ${{ github.event.issue.number }}
+
+            2. Lista las labels disponibles con: gh label list
+               Asigna SOLO labels de las que existan en el repositorio. No crees labels nuevas.
+               Usa el comando: gh issue edit ${{ github.event.issue.number }} --add-label "LABEL"
+
+            3. Comprueba si ya existe un comentario tuyo (de Claude) en este issue con:
+               gh issue view ${{ github.event.issue.number }} --comments
+               - Si ya existe un comentario de diagnóstico previo, edítalo con: gh issue comment COMMENT_ID --body "..."
+               - Si no existe ninguno, crea uno nuevo con: gh issue comment ${{ github.event.issue.number }} --body "..."
+
+            4. El comentario debe estar en español y contener las siguientes secciones en markdown:
+               ## 🔍 Diagnóstico del Issue
+               **Resumen:** (una línea describiendo el problema)
+               **Área afectada:** (qué archivo(s) probablemente involucra: game.js, index.html y/o style.css, y qué parte concreta)
+               **Causa probable:** (hipótesis técnica basada en la arquitectura del juego)
+               **Labels asignadas:** (lista de las labels que pusiste y por qué)
+               **Esbozo de solución:** (pasos concretos para abordar el fix o feature, referenciando funciones/variables del código cuando sea posible)
+               ---
+               *Diagnóstico generado automáticamente por Claude*
