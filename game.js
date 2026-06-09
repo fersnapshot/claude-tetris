@@ -4,17 +4,152 @@ const COLS = 10;
 const ROWS = 20;
 const BLOCK = 30;
 
-const COLORS = [
-  null,
-  "#4dd0e1", // I - cyan
-  "#ffd54f", // O - yellow
-  "#ba68c8", // T - purple
-  "#81c784", // S - green
-  "#e57373", // Z - red
-  "#5b9bd5", // J - pale blue
-  "#ffb74d", // L - orange
-  "#f06292", // anillo - rosa
-];
+const SKINS = {
+  retro: {
+    colors: [
+      null,
+      "#4dd0e1", // I - cyan
+      "#ffd54f", // O - yellow
+      "#ba68c8", // T - purple
+      "#81c784", // S - green
+      "#e57373", // Z - red
+      "#5b9bd5", // J - pale blue
+      "#ffb74d", // L - orange
+      "#f06292", // anillo - rosa
+    ],
+    drawBlock(context, x, y, colorIndex, size, alpha) {
+      if (!colorIndex) return;
+      const color = this.colors[colorIndex];
+      context.globalAlpha = alpha ?? 1;
+      context.fillStyle = color;
+      context.fillRect(x * size + 1, y * size + 1, size - 2, size - 2);
+      context.fillStyle = "rgba(255,255,255,0.12)";
+      context.fillRect(x * size + 1, y * size + 1, size - 2, 4);
+      context.globalAlpha = 1;
+    },
+    applyBg() {
+      document.documentElement.style.removeProperty("--board-bg");
+      document.documentElement.style.removeProperty("--bg");
+    },
+  },
+  neon: {
+    colors: [
+      null,
+      "#00ffff", // I - electric cyan
+      "#ffff00", // O - yellow
+      "#ff00ff", // T - magenta
+      "#00ff66", // S - neon green
+      "#ff2244", // Z - bright red
+      "#4488ff", // J - bright blue
+      "#ff8800", // L - bright orange
+      "#ff44cc", // anillo - neon pink
+    ],
+    drawBlock(context, x, y, colorIndex, size, alpha) {
+      if (!colorIndex) return;
+      const color = this.colors[colorIndex];
+      const effectiveAlpha = alpha ?? 1;
+      context.globalAlpha = effectiveAlpha;
+      context.shadowBlur = 14 * effectiveAlpha;
+      context.shadowColor = color;
+      context.fillStyle = color;
+      context.fillRect(x * size + 1, y * size + 1, size - 2, size - 2);
+      // inner darker fill — reset glow first to avoid shadow on dark overlay
+      context.shadowBlur = 0;
+      context.fillStyle = "rgba(0,0,0,0.45)";
+      context.fillRect(x * size + 3, y * size + 3, size - 6, size - 6);
+      context.globalAlpha = 1;
+    },
+    applyBg() {
+      document.documentElement.style.setProperty("--board-bg", "#000");
+      document.documentElement.style.setProperty("--bg", "#000");
+    },
+  },
+  pastel: {
+    colors: [
+      null,
+      "#b3e5fc", // I - light blue
+      "#fff9c4", // O - light yellow
+      "#e1bee7", // T - light purple
+      "#c8e6c9", // S - light green
+      "#ffcdd2", // Z - light red
+      "#bbdefb", // J - pale blue
+      "#ffe0b2", // L - light orange
+      "#f8bbd0", // anillo - light pink
+    ],
+    drawBlock(context, x, y, colorIndex, size, alpha) {
+      if (!colorIndex) return;
+      const color = this.colors[colorIndex];
+      context.globalAlpha = (alpha ?? 1) * 0.85;
+      context.fillStyle = color;
+      context.fillRect(x * size + 1, y * size + 1, size - 2, size - 2);
+      // soft border instead of highlight
+      context.strokeStyle = "rgba(255,255,255,0.5)";
+      context.lineWidth = 1;
+      context.strokeRect(x * size + 1.5, y * size + 1.5, size - 3, size - 3);
+      context.globalAlpha = 1;
+    },
+    applyBg() {
+      document.documentElement.style.removeProperty("--board-bg");
+      document.documentElement.style.removeProperty("--bg");
+    },
+  },
+  pixel: {
+    colors: [
+      null,
+      "#4dd0e1",
+      "#ffd54f",
+      "#ba68c8",
+      "#81c784",
+      "#e57373",
+      "#5b9bd5",
+      "#ffb74d",
+      "#f06292",
+    ],
+    drawBlock(context, x, y, colorIndex, size, alpha) {
+      if (!colorIndex) return;
+      const color = this.colors[colorIndex];
+      context.globalAlpha = alpha ?? 1;
+      context.fillStyle = color;
+      context.fillRect(x * size + 1, y * size + 1, size - 2, size - 2);
+      // pixel art grid pattern: 3x3 sub-pixels
+      const sub = Math.floor((size - 2) / 3);
+      context.fillStyle = "rgba(0,0,0,0.25)";
+      for (let pr = 0; pr < 3; pr++) {
+        for (let pc = 0; pc < 3; pc++) {
+          // draw thin border lines between sub-pixels
+          if (pc < 2) {
+            context.fillRect(
+              x * size + 1 + (pc + 1) * sub,
+              y * size + 1 + pr * sub,
+              1,
+              sub
+            );
+          }
+          if (pr < 2) {
+            context.fillRect(
+              x * size + 1 + pc * sub,
+              y * size + 1 + (pr + 1) * sub,
+              sub,
+              1
+            );
+          }
+        }
+      }
+      // highlight top-left corner sub-pixel
+      context.fillStyle = "rgba(255,255,255,0.22)";
+      context.fillRect(x * size + 2, y * size + 2, sub - 1, sub - 1);
+      context.globalAlpha = 1;
+    },
+    applyBg() {
+      document.documentElement.style.removeProperty("--board-bg");
+      document.documentElement.style.removeProperty("--bg");
+    },
+  },
+};
+
+// Active skin — restored from localStorage
+const _storedSkin = localStorage.getItem("tetris-skin");
+let activeSkin = (_storedSkin && SKINS[_storedSkin]) ? _storedSkin : "retro";
 
 const PIECES = [
   null,
@@ -207,15 +342,7 @@ function updateHUD() {
 }
 
 function drawBlock(context, x, y, colorIndex, size, alpha) {
-  if (!colorIndex) return;
-  const color = COLORS[colorIndex];
-  context.globalAlpha = alpha ?? 1;
-  context.fillStyle = color;
-  context.fillRect(x * size + 1, y * size + 1, size - 2, size - 2);
-  // highlight
-  context.fillStyle = "rgba(255,255,255,0.12)";
-  context.fillRect(x * size + 1, y * size + 1, size - 2, 4);
-  context.globalAlpha = 1;
+  SKINS[activeSkin].drawBlock(context, x, y, colorIndex, size, alpha);
 }
 
 function drawGrid() {
@@ -358,6 +485,16 @@ restartBtn.addEventListener("click", init);
 
 document.getElementById("themeToggle").addEventListener("change", (e) => {
   document.body.classList.toggle("light-mode", e.target.checked);
+});
+
+const skinSelect = document.getElementById("skinSelect");
+skinSelect.value = activeSkin;
+SKINS[activeSkin].applyBg();
+
+skinSelect.addEventListener("change", (e) => {
+  activeSkin = e.target.value;
+  localStorage.setItem("tetris-skin", activeSkin);
+  SKINS[activeSkin].applyBg();
 });
 
 init();
