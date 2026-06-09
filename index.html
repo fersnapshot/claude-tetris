@@ -58,6 +58,35 @@
         <div class="overlay-box">
           <p id="overlay-title">GAME OVER</p>
           <p id="overlay-score"></p>
+          <p id="overlay-stats"></p>
+
+          <!-- Formulario nombre (solo si entra en top 5) -->
+          <div id="name-form" class="hidden">
+            <p class="name-prompt">¡Entraste en el top 5! Ingresa tu nombre:</p>
+            <div class="name-form-row">
+              <input id="player-name" type="text" maxlength="16" placeholder="Nombre" autocomplete="off" />
+              <button id="save-btn">Guardar</button>
+            </div>
+          </div>
+
+          <!-- Tabla de records -->
+          <div id="leaderboard">
+            <p class="lb-title">RECORDS</p>
+            <table id="lb-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Nombre</th>
+                  <th>Score</th>
+                  <th>Líneas</th>
+                  <th>Combo</th>
+                </tr>
+              </thead>
+              <tbody id="lb-body"></tbody>
+            </table>
+            <button id="reset-records-btn">Borrar records</button>
+          </div>
+
           <button id="restart-btn">Reiniciar</button>
         </div>
       </div>
