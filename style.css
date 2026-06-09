@@ -203,6 +203,25 @@ body.light-mode .toggle-track {
   transition: color 0.25s;
 }
 
+/* ---- Skin selector ---- */
+.skin-select {
+  background: var(--kbd-bg);
+  color: var(--text);
+  border: 1px solid var(--kbd-border);
+  border-radius: 4px;
+  padding: 4px 6px;
+  font-size: 11px;
+  font-family: "Courier New", Courier, monospace;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: background 0.25s, color 0.25s, border-color 0.25s;
+  width: 100%;
+}
+
+.skin-select:focus {
+  outline: 1px solid var(--accent);
+}
+
 /* ---- Overlay ---- */
 .overlay {
   position: absolute;
