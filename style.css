@@ -260,3 +260,137 @@ body.light-mode .toggle-track {
   background: var(--accent-shadow);
   filter: brightness(1.2);
 }
+
+/* ---- Overlay stats (combo/lines) ---- */
+#overlay-stats {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 12px;
+  color: var(--panel-label);
+  letter-spacing: 1px;
+  transition: color 0.25s;
+}
+
+/* ---- Name form ---- */
+#name-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+#name-form.hidden {
+  display: none;
+}
+
+.name-prompt {
+  font-size: 12px;
+  color: var(--text);
+  opacity: 0.85;
+}
+
+.name-form-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+#player-name {
+  background: var(--board-bg);
+  border: 1px solid var(--board-border);
+  border-radius: 4px;
+  color: var(--text);
+  font-size: 13px;
+  padding: 4px 8px;
+  width: 110px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+#player-name:focus {
+  border-color: var(--accent);
+}
+
+#save-btn {
+  background: var(--accent);
+  color: var(--restart-color);
+  border: none;
+  border-radius: 4px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+#save-btn:hover {
+  filter: brightness(1.2);
+}
+
+/* ---- Leaderboard ---- */
+#leaderboard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  width: 100%;
+}
+
+.lb-title {
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--panel-label);
+  font-weight: 600;
+}
+
+#lb-table {
+  border-collapse: collapse;
+  font-size: 11px;
+  width: 100%;
+  max-width: 260px;
+}
+
+#lb-table th,
+#lb-table td {
+  padding: 3px 6px;
+  text-align: center;
+  color: var(--text);
+  border-bottom: 1px solid var(--board-border);
+  transition: color 0.25s, border-color 0.25s;
+}
+
+#lb-table th {
+  color: var(--panel-label);
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+#lb-table td:nth-child(2) {
+  text-align: left;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lb-highlight td {
+  color: var(--accent) !important;
+  font-weight: 700;
+}
+
+#reset-records-btn {
+  background: transparent;
+  border: 1px solid var(--board-border);
+  border-radius: 4px;
+  color: var(--panel-label);
+  font-size: 10px;
+  padding: 3px 10px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+#reset-records-btn:hover {
+  border-color: #e57373;
+  color: #e57373;
+}
