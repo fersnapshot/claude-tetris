@@ -13,6 +13,7 @@ const COLORS = [
   "#e57373", // Z - red
   "#5b9bd5", // J - pale blue
   "#ffb74d", // L - orange
+  "#f06292", // anillo - rosa
 ];
 
 const PIECES = [
@@ -52,6 +53,11 @@ const PIECES = [
     [7, 7, 7],
     [0, 0, 0],
   ], // L
+  [
+    [8, 8, 8],
+    [8, 0, 8],
+    [8, 8, 8],
+  ], // anillo (hueco)
 ];
 
 const LINE_SCORES = [0, 100, 300, 500, 800];
@@ -86,7 +92,7 @@ function createBoard() {
 }
 
 function randomPiece() {
-  const type = Math.floor(Math.random() * 7) + 1;
+  const type = Math.floor(Math.random() * 8) + 1;
   const shape = PIECES[type].map((row) => [...row]);
   return {
     type,
@@ -213,7 +219,9 @@ function drawBlock(context, x, y, colorIndex, size, alpha) {
 }
 
 function drawGrid() {
-  ctx.strokeStyle = getComputedStyle(document.body).getPropertyValue("--grid-color").trim() || "#22222e";
+  ctx.strokeStyle =
+    getComputedStyle(document.body).getPropertyValue("--grid-color").trim() ||
+    "#22222e";
   ctx.lineWidth = 0.5;
   for (let c = 1; c < COLS; c++) {
     ctx.beginPath();
